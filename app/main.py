@@ -3,10 +3,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List
 
-import models.models as models
-import schemas.schemas as schemas
-from database import engine, get_db
-from api.prediction_routes import router as prediction_router
+import app.db.models.models as models
+import app.schemas.schemas as schemas
+from app.db.database import engine, get_db
+from app.api.routes.predictions import router as prediction_router
 
 # Create database tables
 models.Base.metadata.create_all(bind=engine)

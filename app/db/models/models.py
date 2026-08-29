@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Boolean, Text
 from sqlalchemy.orm import relationship
 from datetime import datetime
-from database import Base
+from app.db.database import Base
 
 class RoadSegment(Base):
     __tablename__ = "road_segments"

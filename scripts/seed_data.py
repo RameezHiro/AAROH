@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from database import SessionLocal, engine
-import models.models as models
+from app.db.database import SessionLocal, engine
+import app.db.models.models as models
 
 def seed_database():
     # Create tables first
