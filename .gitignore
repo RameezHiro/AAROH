@@ -33,3 +33,6 @@ data/runtime/
 
 # Windows
 Thumbs.db
+
+# Local configuration
+.agent/
