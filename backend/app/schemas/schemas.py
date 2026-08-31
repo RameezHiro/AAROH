@@ -19,7 +19,7 @@ class RoadSegmentResponse(RoadSegmentBase):
     updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Weather Schemas
 class WeatherBase(BaseModel):
@@ -37,7 +37,7 @@ class WeatherResponse(WeatherBase):
     recorded_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Vehicle Tracking Schemas
 class VehicleBase(BaseModel):
@@ -57,7 +57,7 @@ class VehicleResponse(VehicleBase):
     last_updated: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Incident Report Schemas
 class IncidentBase(BaseModel):
@@ -78,7 +78,7 @@ class IncidentResponse(IncidentBase):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # User Schemas
 class UserBase(BaseModel):
@@ -93,7 +93,66 @@ class UserResponse(UserBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+
+
+# Dashboard Schemas
+class DashboardAlert(BaseModel):
+    type: str
+    message: str
+    severity: str
+    timestamp: datetime
+
+class DashboardIncident(BaseModel):
+    id: int
+    road_segment_id: Optional[int] = None
+    reported_by: str
+    incident_type: str
+    description: str
+    latitude: float
+    longitude: float
+    image_url: Optional[str] = None
+    severity: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class DashboardVehicle(BaseModel):
+    id: int
+    vehicle_number: str
+    driver_name: str
+    cargo_type: str
+    current_lat: float
+    current_lon: float
+    destination: str
+    status: str
+    last_updated: datetime
+
+    class Config:
+        from_attributes = True
+
+class DashboardRoadSegment(BaseModel):
+    id: int
+    name: str
+    district: str
+    state: str
+    risk_level: str
+    condition_score: float
+    is_blocked: bool
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class DashboardResponse(BaseModel):
+    alerts: List[DashboardAlert]
+    incidents: List[DashboardIncident]
+    vehicles: List[DashboardVehicle]
+    roads: List[DashboardRoadSegment]
+    active_alerts_count: int
+    active_incidents_count: int
+    active_vehicles_count: int
 
 class Token(BaseModel):
     access_token: str

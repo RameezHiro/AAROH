@@ -7,6 +7,9 @@ import app.db.models.models as models
 import app.schemas.schemas as schemas
 from app.db.database import engine, get_db
 from app.api.routes.predictions import router as prediction_router
+from app.api.routes.incidents import router as incident_router
+from app.api.routes.alerts import router as alert_router
+from app.api.routes.dashboard import router as dashboard_router
 
 # Create database tables
 models.Base.metadata.create_all(bind=engine)
@@ -26,7 +29,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(prediction_router)
+app.include_router(prediction_router, prefix="/api/predictions", tags=["Predictions"])
+app.include_router(incident_router, prefix="/api/incidents", tags=["Incidents"])
+app.include_router(alert_router, prefix="/api/alerts", tags=["Alerts"])
+app.include_router(dashboard_router, prefix="/api/dashboard", tags=["Dashboard"])
 
 @app.get("/")
 def read_root():

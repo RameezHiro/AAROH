@@ -1,32 +1,39 @@
-import random
+import joblib
+import os
+import pandas as pd
+import numpy as np
 
 class DisruptionPredictor:
     def __init__(self):
-        # In a production environment, load trained scikit-learn/tensorflow model here
-        pass
+        self.model_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../models/artifacts/model.pkl"))
+        self.model = joblib.load(self.model_path)
+        self.risk_mapping = {0: "Low", 1: "Medium", 2: "High"}
 
     def predict_risk(self, rainfall_mm: float, terrain_slope: float, historical_landslides: int) -> dict:
         """
-        Simulate AI model prediction based on rainfall, slope, and history.
-        Returns risk level and disruption probability.
+        Load trained scikit-learn model and predict disruption risk.
+        Returns risk level, disruption probability, confidence, and explanation.
         """
-        # Simple heuristic rule simulating ML probability calculation
-        score = (rainfall_mm * 0.05) + (terrain_slope * 0.03) + (historical_landslides * 0.2)
+        features = pd.DataFrame([[rainfall_mm, terrain_slope, historical_landslides]],
+                                columns=['rainfall_mm', 'terrain_slope', 'historical_landslides'])
 
-        if score > 8.0:
-            risk_level = "High"
-            probability = 0.85 + (random.random() * 0.1)
-        elif score > 4.0:
-            risk_level = "Medium"
-            probability = 0.50 + (random.random() * 0.2)
-        else:
-            risk_level = "Low"
-            probability = 0.10 + (random.random() * 0.2)
+        # Get probability distribution
+        proba = self.model.predict_proba(features)[0]
+        prediction = self.model.predict(features)[0]
+
+        risk_level = self.risk_mapping[prediction]
+        disruption_probability = float(proba[prediction])
+
+        # Confidence is the probability of the predicted class
+        confidence = float(np.max(proba))
+
+        explanation = f"Based on {rainfall_mm}mm rainfall, {terrain_slope}° slope, and {historical_landslides} historical incidents."
 
         return {
             "risk_level": risk_level,
-            "disruption_probability": round(probability, 2),
-            "estimated_delay_hours": round(probability * 12, 1)
+            "disruption_probability": round(disruption_probability, 2),
+            "model_confidence": round(confidence, 2),
+            "explanation": explanation
         }
 
 predictor = DisruptionPredictor()
