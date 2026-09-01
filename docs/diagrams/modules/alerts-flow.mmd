@@ -1,0 +1,33 @@
+graph TD
+    A["GET /api/alerts"] --> B["get_alerts"]
+    B --> C["alert_service.generate_alerts"]
+
+    C --> D["Check Blocked Roads"]
+    C --> E["Check High-Risk Corridors"]
+    C --> F["Check Delayed Vehicles"]
+
+    D --> G["Blocked Roads Alerts"]
+    E --> H["High-Risk Corridors Alerts"]
+    F --> I["Delayed Vehicles Alerts"]
+
+    G --> J["CRITICAL Alerts"]
+    H --> K["HIGH Alerts"]
+    I --> L["MEDIUM Alerts"]
+
+    J --> M["List[Alert Objects]"]
+    K --> M
+    L --> M
+
+    style A fill:#9f9,stroke:#333,stroke-width:2px
+    style B fill:#9f9,stroke:#333,stroke-width:2px
+    style C fill:#ff9,stroke:#333,stroke-width:2px
+    style D fill:#f66,stroke:#333,stroke-width:2px
+    style E fill:#f96,stroke:#333,stroke-width:2px
+    style F fill:#ff9,stroke:#333,stroke-width:2px
+    style G fill:#f66,stroke:#333,stroke-width:2px
+    style H fill:#f96,stroke:#333,stroke-width:2px
+    style I fill:#ff9,stroke:#333,stroke-width:2px
+    style J fill:#f66,stroke:#333,stroke-width:2px
+    style K fill:#f96,stroke:#333,stroke-width:2px
+    style L fill:#ff9,stroke:#333,stroke-width:2px
+    style M fill:#9f9,stroke:#333,stroke-width:2px

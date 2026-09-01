@@ -1,0 +1,13 @@
+graph TD
+    A["GET /api/roads"] --> B["get_road_segments"]
+    B --> C["models.RoadSegment"]
+    C --> D["SQLAlchemy ORM"]
+    D --> E["SQLite Database"]
+    E --> F["List[RoadSegmentResponse]"]
+
+    style A fill:#9f9,stroke:#333,stroke-width:2px
+    style B fill:#9f9,stroke:#333,stroke-width:2px
+    style C fill:#f96,stroke:#333,stroke-width:2px
+    style D fill:#9f9,stroke:#333,stroke-width:2px
+    style E fill:#9ff,stroke:#333,stroke-width:2px
+    style F fill:#9f9,stroke:#333,stroke-width:2px

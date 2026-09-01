@@ -1,0 +1,38 @@
+graph TD
+    %% ===== API ENDPOINT =====
+    A["GET /api/dashboard"] --> B["get_dashboard_data"]
+    style A fill:#9f9,stroke:#333,stroke-width:2px,color:#000
+    style B fill:#9f9,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== DASHBOARD SERVICE =====
+    B --> C["dashboard_service.get_dashboard_data"]
+    style C fill:#ff9,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== ALERT SERVICE =====
+    C --> D["alert_service.generate_alerts"]
+    style D fill:#ff9,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== DATABASE QUERIES =====
+    C --> E["Get Incidents"]
+    C --> F["Get Vehicles"]
+    C --> G["Get Roads"]
+    style E fill:#9f9,stroke:#333,stroke-width:2px,color:#000
+    style F fill:#9f9,stroke:#333,stroke-width:2px,color:#000
+    style G fill:#9f9,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== DATA TRANSFORMATION =====
+    D --> H["DashboardAlert Objects"]
+    E --> I["DashboardIncident Objects"]
+    F --> J["DashboardVehicle Objects"]
+    G --> K["DashboardRoadSegment Objects"]
+    style H fill:#ff9,stroke:#333,stroke-width:2px,color:#000
+    style I fill:#ff9,stroke:#333,stroke-width:2px,color:#000
+    style J fill:#ff9,stroke:#333,stroke-width:2px,color:#000
+    style K fill:#ff9,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== RESPONSE =====
+    H --> L["DashboardResponse"]
+    I --> L
+    J --> L
+    K --> L
+    style L fill:#9f9,stroke:#333,stroke-width:2px,color:#000

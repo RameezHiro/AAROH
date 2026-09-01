@@ -1,0 +1,34 @@
+graph TD
+    %% ===== ROUTING SERVICE =====
+    A["Routing Service"] --> B["build_graph"]
+    style A fill:#ff9,stroke:#333,stroke-width:2px,color:#000
+    style B fill:#ff9,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== GRAPH CONSTRUCTION =====
+    B --> C["Load Road Segments"]
+    style C fill:#9f9,stroke:#333,stroke-width:2px,color:#000
+
+    C --> D["NetworkX Graph"]
+    style D fill:#f96,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== ROUTE FINDING =====
+    D --> E["find_route"]
+    style E fill:#ff9,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== INPUT PARAMETERS =====
+    E --> F["Start ID"]
+    E --> G["End ID"]
+    style F fill:#9f9,stroke:#333,stroke-width:2px,color:#000
+    style G fill:#9f9,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== RISK WEIGHTING =====
+    E --> H["Apply Risk Weights"]
+    style H fill:#ff9,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== PATH CALCULATION =====
+    H --> I["Dijkstra's Algorithm"]
+    style I fill:#9f9,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== RESPONSE =====
+    I --> J["Route Response"]
+    style J fill:#9f9,stroke:#333,stroke-width:2px,color:#000

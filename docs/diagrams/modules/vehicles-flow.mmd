@@ -1,0 +1,13 @@
+graph TD
+    A["GET /api/vehicles"] --> B["get_vehicles"]
+    B --> C["models.VehicleTracking"]
+    C --> D["SQLAlchemy ORM"]
+    D --> E["SQLite Database"]
+    E --> F["List[VehicleResponse]"]
+
+    style A fill:#9f9,stroke:#333,stroke-width:2px
+    style B fill:#9f9,stroke:#333,stroke-width:2px
+    style C fill:#f96,stroke:#333,stroke-width:2px
+    style D fill:#9f9,stroke:#333,stroke-width:2px
+    style E fill:#9ff,stroke:#333,stroke-width:2px
+    style F fill:#9f9,stroke:#333,stroke-width:2px
