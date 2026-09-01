@@ -1,0 +1,48 @@
+graph TD
+    %% ===== FASTAPI APPLICATION =====
+    A["FastAPI Application"] -->|Imports| B["get_db Dependency"]
+    style A fill:#bbf,stroke:#333,stroke-width:2px,color:#000
+    style B fill:#9f9,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== DEPENDENCY INJECTION =====
+    B --> C["SessionLocal"]
+    style C fill:#ff9,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== SQLALCHEMY ORM =====
+    C --> D["SQLAlchemy ORM"]
+    style D fill:#9f9,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== DOMAIN MODELS =====
+    D --> E["Domain Models"]
+    style E fill:#f96,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== DATABASE TABLES =====
+    E --> F1["RoadSegment"]
+    E --> F2["WeatherData"]
+    E --> F3["VehicleTracking"]
+    E --> F4["IncidentReport"]
+    E --> F5["User"]
+    style F1 fill:#9ff,stroke:#333,stroke-width:2px,color:#000
+    style F2 fill:#9ff,stroke:#333,stroke-width:2px,color:#000
+    style F3 fill:#9ff,stroke:#333,stroke-width:2px,color:#000
+    style F4 fill:#9ff,stroke:#333,stroke-width:2px,color:#000
+    style F5 fill:#9ff,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== DATABASE SYSTEMS =====
+    F1 --> G["SQLite Database"]
+    F2 --> G
+    F3 --> G
+    F4 --> G
+    F5 --> G
+    style G fill:#9ff,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== FUTURE DATABASE =====
+    G --> H["PostgreSQL/PostGIS"]
+    style H fill:#9ff,stroke:#333,stroke-width:2px,stroke-dasharray: 5 5,color:#000
+
+    %% ===== MODEL DETAILS =====
+    subgraph Models["Domain Models"]
+      direction TB
+      M1["RoadSegment"] -->|has| M2["incidents: relationship"]
+      M3["IncidentReport"] -->|belongs_to| M4["RoadSegment"]
+    end

@@ -1,0 +1,43 @@
+graph LR
+    %% ===== API ENDPOINT =====
+    A["POST /api/incidents"] --> B["create_incident"]
+    style A fill:#9f9,stroke:#333,stroke-width:2px,color:#000
+    style B fill:#9f9,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== SCHEMAS =====
+    B --> C["schemas.IncidentCreate"]
+    style C fill:#ff9,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== MODEL =====
+    C --> D["models.IncidentReport"]
+    style D fill:#f96,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== ORM =====
+    D --> E["SQLAlchemy ORM"]
+    style E fill:#9f9,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== DATABASE =====
+    E --> F["SQLite Database"]
+    style F fill:#9ff,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== INTEGRATION SERVICE =====
+    F --> G["Integration Service"]
+    style G fill:#ff9,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== PREDICTION SERVICE =====
+    G --> H["Prediction Service"]
+    style H fill:#ff9,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== ROUTING SERVICE =====
+    G --> I["Routing Service"]
+    style I fill:#ff9,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== VEHICLE SERVICE =====
+    G --> J["Vehicle Service"]
+    style J fill:#ff9,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== RESPONSE =====
+    H --> K["Incident Response"]
+    I --> K
+    J --> K
+    style K fill:#9f9,stroke:#333,stroke-width:2px,color:#000

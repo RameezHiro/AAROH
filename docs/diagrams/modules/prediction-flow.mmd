@@ -1,0 +1,25 @@
+graph TD
+    %% ===== API ENDPOINT =====
+    A["POST /api/predictions/evaluate-road"] --> B["PredictionRequest Validation"]
+    style A fill:#9f9,stroke:#333,stroke-width:2px,color:#000
+    style B fill:#9f9,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== PREDICTION SERVICE =====
+    B --> C["DisruptionPredictor.predict_risk"]
+    style C fill:#ff9,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== ML MODEL LOADING =====
+    C --> D["Load ML Model"]
+    style D fill:#f96,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== MODEL PREDICTION =====
+    D --> E["RandomForestClassifier.predict_proba"]
+    style E fill:#f96,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== RISK CLASSIFICATION =====
+    E --> F["Risk Level Mapping"]
+    style F fill:#ff9,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== RESPONSE =====
+    F --> G["PredictionResponse"]
+    style G fill:#9f9,stroke:#333,stroke-width:2px,color:#000

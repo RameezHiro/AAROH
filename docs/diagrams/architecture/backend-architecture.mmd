@@ -1,0 +1,73 @@
+graph TD
+    %% ===== CLIENT =====
+    A["Frontend Client"] -->|HTTP/HTTPS| B["FastAPI Application"]
+    style A fill:#f9f,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== FASTAPI APPLICATION =====
+    B -->|Includes| C["API Routes"]
+    style B fill:#bbf,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== API ROUTES =====
+    C -->|/api/predictions| D["Predictions"]
+    C -->|/api/incidents| E["Incidents"]
+    C -->|/api/alerts| F["Alerts"]
+    C -->|/api/dashboard| G["Dashboard"]
+    C -->|/api/roads| H["Roads"]
+    C -->|/api/weather| I["Weather"]
+    C -->|/api/vehicles| J["Vehicles"]
+    style C fill:#9f9,stroke:#333,stroke-width:2px,color:#000
+    style D fill:#9f9,stroke:#333,stroke-width:2px,color:#000
+    style E fill:#9f9,stroke:#333,stroke-width:2px,color:#000
+    style F fill:#9f9,stroke:#333,stroke-width:2px,color:#000
+    style G fill:#9f9,stroke:#333,stroke-width:2px,color:#000
+    style H fill:#9f9,stroke:#333,stroke-width:2px,color:#000
+    style I fill:#9f9,stroke:#333,stroke-width:2px,color:#000
+    style J fill:#9f9,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== SERVICES LAYER =====
+    D -->|Uses| K["Prediction Service"]
+    E -->|Uses| L["Integration Service"]
+    F -->|Uses| M["Alert Service"]
+    G -->|Uses| N["Dashboard Service"]
+    K -->|Uses| O["Routing Service"]
+    K -->|Uses| P["Vehicle Service"]
+    style K fill:#ff9,stroke:#333,stroke-width:2px,color:#000
+    style L fill:#ff9,stroke:#333,stroke-width:2px,color:#000
+    style M fill:#ff9,stroke:#333,stroke-width:2px,color:#000
+    style N fill:#ff9,stroke:#333,stroke-width:2px,color:#000
+    style O fill:#ff9,stroke:#333,stroke-width:2px,color:#000
+    style P fill:#ff9,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== DATABASE LAYER =====
+    H -->|Uses| Q["RoadSegment Model"]
+    I -->|Uses| R["WeatherData Model"]
+    J -->|Uses| S["VehicleTracking Model"]
+    E -->|Uses| T["IncidentReport Model"]
+    style Q fill:#f96,stroke:#333,stroke-width:2px,color:#000
+    style R fill:#f96,stroke:#333,stroke-width:2px,color:#000
+    style S fill:#f96,stroke:#333,stroke-width:2px,color:#000
+    style T fill:#f96,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== ML MODEL =====
+    K -->|Loads| U["ML Model: RandomForest"]
+    style U fill:#f96,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== DATABASE SYSTEMS =====
+    Q -->|SQLAlchemy ORM| V["SQLite Database"]
+    R -->|SQLAlchemy ORM| V
+    S -->|SQLAlchemy ORM| V
+    T -->|SQLAlchemy ORM| V
+    style V fill:#9ff,stroke:#333,stroke-width:2px,color:#000
+
+    %% ===== FUTURE DATABASE =====
+    V -->|Configured for| W["PostgreSQL/PostGIS"]
+    style W fill:#9ff,stroke:#333,stroke-width:2px,stroke-dasharray: 5 5,color:#000
+
+    %% ===== LEGEND =====
+    subgraph Legend["Legend"]
+      direction TB
+      L1["🟢 API Routes"] --> L2["🟡 Services"]
+      L3["🟠 Models"] --> L4["🔵 Database"]
+      L5["🟣 FastAPI"] --> L6["🟤 ML Model"]
+      L7["Solid Border = Implemented"] --> L8["Dashed Border = Future"]
+    end
