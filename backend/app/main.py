@@ -10,6 +10,7 @@ from app.api.routes.predictions import router as prediction_router
 from app.api.routes.incidents import router as incident_router
 from app.api.routes.alerts import router as alert_router
 from app.api.routes.dashboard import router as dashboard_router
+from app.api.routes.routing import router as routing_router
 
 # Create database tables
 models.Base.metadata.create_all(bind=engine)
@@ -33,6 +34,7 @@ app.include_router(prediction_router, prefix="/api/predictions", tags=["Predicti
 app.include_router(incident_router, prefix="/api/incidents", tags=["Incidents"])
 app.include_router(alert_router, prefix="/api/alerts", tags=["Alerts"])
 app.include_router(dashboard_router, prefix="/api/dashboard", tags=["Dashboard"])
+app.include_router(routing_router, prefix="/api/routing", tags=["Routing"])
 
 @app.get("/")
 def read_root():
@@ -55,6 +57,12 @@ def create_road_segment(road: schemas.RoadSegmentCreate, db: Session = Depends(g
     db.commit()
     db.refresh(db_road)
     return db_road
+
+# --- Road Nodes Endpoints ---
+@app.get("/api/road-nodes", response_model=List[schemas.RoadNodeResponse])
+def get_road_nodes(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    nodes = db.query(models.RoadNode).offset(skip).limit(limit).all()
+    return nodes
 
 # --- Weather Endpoints ---
 @app.get("/api/weather", response_model=List[schemas.WeatherResponse])

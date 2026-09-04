@@ -3,11 +3,23 @@ from sqlalchemy.orm import relationship
 from datetime import datetime
 from app.db.database import Base
 
+class RoadNode(Base):
+    __tablename__ = "road_nodes"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=True)
+    latitude = Column(Float)
+    longitude = Column(Float)
+    district = Column(String, nullable=True)
+    state = Column(String, nullable=True)
+
 class RoadSegment(Base):
     __tablename__ = "road_segments"
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
+    start_node_id = Column(Integer, ForeignKey("road_nodes.id"))
+    end_node_id = Column(Integer, ForeignKey("road_nodes.id"))
     district = Column(String, index=True)
     state = Column(String, index=True)
     risk_level = Column(String, default="Low") # Low, Medium, High, Blocked
@@ -16,6 +28,8 @@ class RoadSegment(Base):
     updated_at = Column(DateTime, default=datetime.utcnow)
 
     incidents = relationship("IncidentReport", back_populates="road_segment")
+    start_node = relationship("RoadNode", foreign_keys=[start_node_id])
+    end_node = relationship("RoadNode", foreign_keys=[end_node_id])
 
 class WeatherData(Base):
     __tablename__ = "weather_data"

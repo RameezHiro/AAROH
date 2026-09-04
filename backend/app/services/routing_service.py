@@ -6,100 +6,127 @@
 import networkx as nx
 from sqlalchemy.orm import Session
 from app.db.database import get_db
-from app.db.models.models import RoadSegment
+from app.db.models.models import RoadSegment, RoadNode
 from typing import List, Dict, Tuple, Optional
 
 
 class RoutingService:
     def __init__(self):
         self.graph = nx.DiGraph()
+        self.risk_weights = {"Low": 1.0, "Medium": 2.5, "High": 5.0, "Blocked": float('inf')}
 
-    def build_graph(self) -> None:
+    def build_graph(self, db: Session) -> None:
         """
-        Load road segments from the database and construct a directed graph.
+        Load road nodes and segments from the database and construct a directed graph.
+        Each RoadSegment is an edge between RoadNodes.
+        Blocked roads are excluded entirely from the graph.
         """
-        db = next(get_db())
-        try:
-            # Clear existing graph
-            self.graph.clear()
+        self.graph.clear()
 
-            # Fetch all road segments from the database
-            road_segments = db.query(RoadSegment).all()
+        # Add all road nodes to the graph
+        nodes = db.query(RoadNode).all()
+        for node in nodes:
+            self.graph.add_node(
+                node.id,
+                name=node.name,
+                latitude=node.latitude,
+                longitude=node.longitude,
+                district=node.district,
+                state=node.state
+            )
 
-            # Build directed graph
-            for segment in road_segments:
-                self.graph.add_node(segment.id, name=segment.name, risk_level=segment.risk_level)
+        # Add edges only for non-blocked roads
+        segments = db.query(RoadSegment).filter(RoadSegment.is_blocked == False).all()
+        for segment in segments:
+            # Determine edge weight based on risk level
+            weight = self.risk_weights.get(segment.risk_level, 1.0)
 
-            # Add edges between road segments (simplified for MVP)
-            # In a real implementation, this would use a topology file or PostGIS
-            # For now, we'll create a fully connected graph for testing
-            for i in range(len(road_segments)):
-                for j in range(len(road_segments)):
-                    if i != j:  # Avoid self-loops
-                        u = road_segments[i].id
-                        v = road_segments[j].id
-                        self.graph.add_edge(u, v, weight=1.0)
+            self.graph.add_edge(
+                segment.start_node_id,
+                segment.end_node_id,
+                weight=weight,
+                road_id=segment.id,
+                road_name=segment.name,
+                risk_level=segment.risk_level,
+                is_blocked=False  # Explicitly mark as non-blocked
+            )
 
-            print(f"Graph built with {len(self.graph.nodes)} nodes and {len(self.graph.edges)} edges.")
+        print(f"Graph built with {len(self.graph.nodes)} nodes and {len(self.graph.edges)} edges.")
 
-        finally:
-            db.close()
-
-    def find_route(self, start_id: int, end_id: int) -> Dict:
+    def find_route(self, start_id: int, end_id: int, db: Session) -> Dict:
         """
-        Find the optimal route from start_id to end_id using Dijkstra's algorithm.
-        Dynamic edge costs are applied based on risk level.
+        Find the optimal risk-aware route from start_id to end_id using Dijkstra's algorithm.
 
         Returns:
             {
-                "path": List[int],
+                "path_nodes": List[int],
+                "path_roads": List[int],
                 "total_risk_score": float,
-                "avoided_segments": List[int]
+                "risk_details": List[Dict],
+                "coordinates": List[Dict]
             }
         """
+        # Rebuild the graph with the current database state
+        self.build_graph(db)
+
+        # Check if start or end node is missing
         if start_id not in self.graph or end_id not in self.graph:
             raise ValueError("Start or end node not found in graph.")
 
-        # Create a copy of the graph to avoid modifying the original
-        working_graph = self.graph.copy()
+        # Check if start and end nodes are the same
+        if start_id == end_id:
+            raise ValueError("Start node and end node must be different.")
 
-        # Apply dynamic edge costs based on risk level
-        for u, v, data in list(working_graph.edges(data=True)):
-            u_risk = working_graph.nodes[u].get('risk_level', 'Low')
-            v_risk = working_graph.nodes[v].get('risk_level', 'Low')
-
-            # If either node is blocked, prune the edge
-            if u_risk == "Blocked" or v_risk == "Blocked":
-                working_graph.remove_edge(u, v)
-                continue
-
-            # Determine maximum risk level between u and v
-            risk_weights = {"Low": 1.0, "Medium": 2.0, "High": 10.0}
-            max_weight = max(risk_weights.get(u_risk, 1.0), risk_weights.get(v_risk, 1.0))
-            data['weight'] = max_weight
-
-        # Calculate total risk score and identify avoided segments
         try:
-            path = nx.shortest_path(working_graph, source=start_id, target=end_id, weight='weight')
+            path_nodes = nx.shortest_path(self.graph, source=start_id, target=end_id, weight='weight')
 
-            risk_weights = {"Low": 1.0, "Medium": 2.0, "High": 10.0}
+            # Get the road segments along the path
+            path_roads = []
             total_risk_score = 0.0
+            risk_details = []
 
-            # Calculate total risk score along the path
-            for node_id in path:
-                risk = self.graph.nodes[node_id].get('risk_level', 'Low')
-                total_risk_score += risk_weights.get(risk, 1.0)
+            # Calculate total risk score and collect risk details
+            for i in range(len(path_nodes) - 1):
+                u = path_nodes[i]
+                v = path_nodes[i + 1]
+                if (u, v) not in self.graph.edges:
+                    raise ValueError("No path exists between start and end nodes.")
+                edge_data = self.graph.edges[u, v]
+                road_id = edge_data['road_id']
+                road_name = edge_data['road_name']
+                risk_level = edge_data['risk_level']
+                weight = edge_data['weight']
 
-            # Find all high-risk or blocked segments in the graph that were avoided
-            avoided_segments = [
-                node_id for node_id, data in self.graph.nodes(data=True)
-                if data.get('risk_level') in ["High", "Blocked"] and node_id not in path
-            ]
+                path_roads.append(road_id)
+                total_risk_score += weight
+                risk_details.append({
+                    "road_id": road_id,
+                    "road_name": road_name,
+                    "risk_level": risk_level,
+                    "risk_weight": weight,
+                    "is_blocked": False
+                })
+
+            # Get coordinates for the path nodes
+            coordinates = []
+            for node_id in path_nodes:
+                node_data = self.graph.nodes[node_id]
+                coordinates.append({
+                    "node_id": node_id,
+                    "latitude": node_data['latitude'],
+                    "longitude": node_data['longitude'],
+                    "name": node_data.get('name', ''),
+                    "district": node_data.get('district', ''),
+                    "state": node_data.get('state', '')
+                })
 
             return {
-                "path": path,
+                "path_nodes": path_nodes,
+                "path_roads": path_roads,
                 "total_risk_score": round(total_risk_score, 2),
-                "avoided_segments": avoided_segments
+                "risk_details": risk_details,
+                "coordinates": coordinates,
+                "avoided_roads": None
             }
 
         except nx.NetworkXNoPath:

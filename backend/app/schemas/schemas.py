@@ -1,8 +1,50 @@
 from pydantic import BaseModel, Field
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Dict
 
-# Road Segment Schemas
+# Routing Schemas
+class RouteRequest(BaseModel):
+    start_node_id: int
+    end_node_id: int
+
+class RoadNodeResponse(BaseModel):
+    id: int
+    name: Optional[str] = None
+    latitude: float
+    longitude: float
+    district: Optional[str] = None
+    state: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+class RouteNodeDetail(BaseModel):
+    node_id: int
+    name: Optional[str] = None
+    latitude: float
+    longitude: float
+    district: Optional[str] = None
+    state: Optional[str] = None
+
+class RouteRoadDetail(BaseModel):
+    road_id: int
+    road_name: str
+    risk_level: str
+    is_blocked: bool
+    risk_weight: float
+
+class RouteResponse(BaseModel):
+    path_nodes: List[int]
+    path_roads: List[int]
+    total_risk_score: float
+    risk_details: List[RouteRoadDetail]
+    coordinates: List[RouteNodeDetail]
+    avoided_roads: Optional[List[RouteRoadDetail]] = None
+
+    class Config:
+        from_attributes = True
+
+# Existing schemas (unchanged)
 class RoadSegmentBase(BaseModel):
     name: str
     district: str
@@ -94,7 +136,6 @@ class UserResponse(UserBase):
 
     class Config:
         from_attributes = True
-
 
 # Dashboard Schemas
 class DashboardAlert(BaseModel):
